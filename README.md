@@ -7,13 +7,7 @@
 执行
 
 ```bash
-composer require --prefer-dist myweishanli/yii2-ip2location
-```
-
-或添加
-
-```
-"myweishanli/yii2-ip2location": "~1.0.0"
+composer require --prefer-dist xiaopig123456/yii2-ip2location
 ```
 
 ## 根据IP查询
