@@ -27,11 +27,5 @@ print_r($locationModel->toArray());
 // )
 ```
 
-## 升级数据库
-
-```php
-use \wsl\ip2location\QQWry;
-
-$qqwry = new QQWry();
-$qqwry->upgrade();
-```
+## 数据库最新版本
+数据库最后更新版本2020年5月25日
