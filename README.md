@@ -13,19 +13,21 @@ composer require --prefer-dist xiaopig123456/yii2-ip2location
 ## 根据IP查询
 ```php
 use \wsl\ip2location\Ip2Location;
+// 查询ip
+$ipAddress = Ip2Location::getIpAddress();
+echo $ipAddress;
+// 8.8.8.8
 
-$ipLocation = new Ip2Location();
-$locationModel = $ipLocation->getLocation('8.8.8.8');
+// 根据查询地址
+$locationModel = Ip2Location::getIpAddress($ipAddress);
 print_r($locationModel->toArray());
 // Array
 // (
-//     [ip] => 8.8.8.8
-//     [begin_ip] => 8.8.8.8
-//     [end_ip] => 8.8.8.8
 //     [country] => 美国
-//     [area] => 加利福尼亚州圣克拉拉县山景市谷歌公司DNS服务器
+//     [province] => null
+//     [city] => null
+//     [description] => 加利福尼亚州圣克拉拉县山景市谷歌公司DNS服务器
 // )
 ```
-
 ## 数据库最新版本
-数据库最后更新版本2020年5月25日
+数据库最后更新版本2020年7月25日

@@ -138,7 +138,7 @@ class Ip2Location
      * @param string $ip 查询的ip
      * @return null|Location
      */
-    public function getLocation($ip)
+    private function getLocationByIp($ip)
     {
         if (!$this->fp) return null; // 如果数据文件没有被正确打开，则直接返回空
         $location['ip'] = gethostbyname($ip); // 将输入的域名转化为IP地址
@@ -238,4 +238,65 @@ class Ip2Location
         }
         $this->fp = 0;
     }
+
+    /**
+     * 获取IP地址
+     * @return mixed
+     */
+    static public function getIpAddress(){
+        if(getenv('HTTP_CLIENT_IP') && strcasecmp(getenv('HTTP_CLIENT_IP'), 'unknown')) {
+            $ip = getenv('HTTP_CLIENT_IP');
+        } elseif(getenv('HTTP_X_FORWARDED_FOR') && strcasecmp(getenv('HTTP_X_FORWARDED_FOR'), 'unknown')) {
+            $ip = getenv('HTTP_X_FORWARDED_FOR');
+        } elseif(getenv('REMOTE_ADDR') && strcasecmp(getenv('REMOTE_ADDR'), 'unknown')) {
+            $ip = getenv('REMOTE_ADDR');
+        } elseif(isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], 'unknown')) {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }else{
+            $ip = '';
+        }
+        $res =  preg_match ( '/[\d\.]{7,15}/', $ip, $matches ) ? $matches [0] : '';
+        return $res;
+    }
+
+    /**
+     * 根据ip获取所在地
+     *
+     * @param null|string $ipAddress
+     *
+     * @return array
+     */
+    static public function getLocation($ipAddress = null){
+        $ipLocation = new self();
+        $locationModel = $ipLocation->getLocationByIp(empty($ipAddress)?self::getIpAddress():$ipAddress);
+        $locationModel = $locationModel->toArray();
+
+        $res = [];
+        foreach (self::$provinces as $key =>$value){
+            if(stripos($locationModel['country'],$value) === 0){
+                $res['country'] = '中国';
+                $res['province'] = $value;
+                $res['city'] = str_replace($value,'',$locationModel['country']);
+                if(empty($res['city'])) $res['city'] = $key>2?$res['province']:null;
+                break;
+            }
+        }
+
+        if(empty($res)){
+            $res['country'] = $locationModel['country'] === '局域网' || $locationModel['country'] === 'IANA'?null:$locationModel['country'];
+            $res['province'] = null;
+            $res['city'] = null;
+        }
+
+        $res['description'] = $locationModel['area']?:null;
+
+        return $res;
+    }
+
+    /**
+     * @var array 中国省
+     */
+    public static $provinces = ["香港", "澳门", "台湾省","黑龙江省", "辽宁省", "吉林省", "河北省", "河南省", "湖北省", "湖南省", "山东省", "山西省", "陕西省",
+        "安徽省", "浙江省", "江苏省", "福建省", "广东省", "海南省", "四川省", "云南省", "贵州省", "青海省", "甘肃省",
+        "江西省", "内蒙古", "宁夏", "新疆", "西藏", "广西", "北京市", "上海市", "天津市", "重庆市"];
 }
